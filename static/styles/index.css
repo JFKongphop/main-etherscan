@@ -1,0 +1,56 @@
+
+
+.headpg{
+    align-items: center;
+    justify-content: space-around;
+    padding: 30px 5%;
+    display: flex;
+    flex-direction: row;
+}
+
+.price, .gas{
+    font-size: 20px;
+
+}
+
+.namep{
+    padding-bottom: 10px;
+    font-weight: 700;
+}
+
+
+.data{
+    display: flex;
+    padding-bottom: 5%;
+}
+
+.blocks{
+    width: 50%;
+    margin-right: 10px;
+}
+
+.transactions{
+    width: 50%;
+    margin-left: 10px;
+}
+
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+  
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+    border: none;
+}
+
+tr:nth-child(odd) {
+    background-color: #f2f2f2;
+}
+  
+tr:nth-child(even) {
+    background-color: #dddddd;
+}

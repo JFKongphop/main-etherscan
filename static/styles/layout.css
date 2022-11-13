@@ -1,0 +1,75 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+.navbarc{
+    height: 20vh;
+    background-color: black;
+}
+
+.containersc{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 5%;
+
+}
+
+.main-appc{
+    margin-bottom: 10px;
+    color: white;
+    font-size: 40px;
+    cursor: pointer;
+}
+
+.inputc{
+    height: 40px;
+    width: 650px;
+    border: none;
+    outline: none;
+    padding-left: 10px;
+    border-radius: 10px 0 0 10px;
+    font-size: 16.5px;
+}
+
+.searchc{
+    margin-left: -10px;
+    height: 40px;
+    width: 100px;
+    border: none;
+    background-color: rgb(79, 79, 241);
+    cursor: pointer;
+    border-radius: 0 10px 10px 0;
+    font-weight: 550;
+    font-size: 16.5px;
+}
+
+.searchc:hover{
+    background-color: rgb(100, 100, 255);
+}
+
+.btnc-container{
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btnc{
+    padding: 10px 30px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: black;
+    border: none;
+}
+
+.btnc:hover{
+    background-color: rgb(216, 216, 216);
+}
+
+.btnc:active{
+    transform: scale(0.98);
+}
+
+a:link { text-decoration: none; }
