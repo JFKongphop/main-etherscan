@@ -1,4 +1,4 @@
-import config, time, ccxt
+import config, time, ccxt, hideData
 from flask import Flask, render_template, request, flash, redirect, url_for, session
 from web3 import Web3
 import requests
@@ -7,8 +7,8 @@ import json
 app = Flask(__name__, template_folder="templates")
 app.config['SECRET_KEY'] = 'somerandomstring'
 
-w3 = Web3(Web3.HTTPProvider(config.MAINNET_ETH)).eth
-wCheck = Web3(Web3.HTTPProvider(config.MAINNET_ETH))
+w3 = Web3(Web3.HTTPProvider(hideData.MAINNET_ETH)).eth
+wCheck = Web3(Web3.HTTPProvider(hideData.MAINNET_ETH))
 
 
 def getEthPrice():
@@ -40,7 +40,7 @@ def index():
     ethPrice = getEthPrice()
     latestBlocks = []
     latestTransactions = []
-    nodes = getNode(config.API_NODE_URL)
+    nodes = getNode(hideData.API_NODE_URL)
     
 
     # get latest 15 blocks to show
@@ -125,7 +125,7 @@ def address():
     balance = str(w3.get_balance(address) / 1000000000000000000)
 
     # get total supply of token if it token address
-    totalSupply = getTokenTotalSupply(address, config.API_KEY)
+    totalSupply = getTokenTotalSupply(address, hideData.API_KEY)
 
     # render to address page
     return render_template(

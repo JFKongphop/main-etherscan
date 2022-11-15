@@ -1,9 +1,3 @@
-MAINNET_ETH = "https://mainnet.infura.io/v3/27543c9fa7ab46a79c091fcd44e7df02"
-API_KEY = "G4WFQHHUQBENT2U1XSVUEWVXCXJZS7M58T"
-API_NODE_URL = f"https://api.etherscan.io/api?module=stats&action=nodecount&apikey=G4WFQHHUQBENT2U1XSVUEWVXCXJZS7M58T"
-EMAIL = "destination071159@gmail.com"
-PASSWORD = "eljv mfki dhxu mdzc"
-
 MINERS = {
     "0x00192fb10df37c9fb26829eb2cc623cd1bf599e8":"2Miners: PPLNS",
     "0x002e08000acbbae2155fab7ac01929564949070d":"2Miners: SOLO",
