@@ -1,13 +1,15 @@
 import config, time, ccxt
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask, render_template, request, flash, redirect, url_for, session
 from web3 import Web3
-
+import requests
+import json
 
 app = Flask(__name__, template_folder="templates")
 app.config['SECRET_KEY'] = 'somerandomstring'
 
-w3 = Web3(Web3.HTTPProvider("https://mainnet.infura.io/v3/27543c9fa7ab46a79c091fcd44e7df02")).eth
-wCheck = Web3(Web3.HTTPProvider("https://mainnet.infura.io/v3/27543c9fa7ab46a79c091fcd44e7df02"))
+w3 = Web3(Web3.HTTPProvider(config.MAINNET_ETH)).eth
+wCheck = Web3(Web3.HTTPProvider(config.MAINNET_ETH))
+
 
 def getEthPrice():
     price = ccxt.binance()
@@ -15,12 +17,31 @@ def getEthPrice():
 
     return ethPrice
 
+def getNode(url):
+    response_API = requests.get(url)
+    data = json.loads(response_API.text)
+    
+    return data['result']['TotalNodeCount']
+
+def getTokenTotalSupply(address, apiKey):
+    response_API = f"https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress={address}&apikey={apiKey}"
+    data = requests.get(response_API)
+    totalSupply = "{:,}".format(int(json.loads(data.text)["result"]) / 1000)
+    
+    if totalSupply != "0.0":
+        return totalSupply
+    else:
+        return "Non-Address"
+
+
 @app.route("/")
 def index():
     #eth = w3.eth
     ethPrice = getEthPrice()
     latestBlocks = []
     latestTransactions = []
+    nodes = getNode(config.API_NODE_URL)
+    
 
     # get latest 15 blocks to show
     # get by block number and reverse from latest
@@ -49,7 +70,8 @@ def index():
         gasPrice = gasPrice,
         ethPrice = ethPrice,
         latestBlocks = latestBlocks,
-        latestTransactions = latestTransactions
+        latestTransactions = latestTransactions,
+        nodes = nodes
     )
 
 @app.route("/address")
@@ -100,14 +122,18 @@ def address():
 
 
     # get balance from this address
-    balance = w3.get_balance(address) / 1000000000000000000
+    balance = str(w3.get_balance(address) / 1000000000000000000)
+
+    # get total supply of token if it token address
+    totalSupply = getTokenTotalSupply(address, config.API_KEY)
 
     # render to address page
     return render_template(
         'address.html',
         ethPrice = ethPrice,
         address = address,
-        balance = balance
+        balance = balance,
+        totalSupply = totalSupply
     )
 
 @app.route("/block/<block_number>")
@@ -145,5 +171,42 @@ def transaction(hash):
         ethPrice = ethPrice
     )
 
+# direct to login page
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+# get token session
+@app.route('/loginAdmin', methods=["POST", "GET"])
+def loginAdmin():
+    if request.method == "POST":
+        email = request.form["email"]
+        password = request.form["password"]
+        session["email"] = email
+        session["password"] = password
+        print(email, password)
+
+        if not email or not password:
+            return render_template(
+                'login.html', 
+                errorEmail = "Please-enter-email", 
+                errorPassword = "Please-enter-password"
+            )
+
+        if session["email"] == "lada071159@gmail.com" and session["password"] == "123":
+            return render_template(
+                'admin.html',
+            )
+        else:
+            flash('Only Admin', 'danger')
+            return redirect('/')
+
+# more feature 
+'''
+    1 login admin
+    2 send message to database
+    3 get message to crud in admin page
+    4 deploy contract by web3.py
+'''
 
 app.run()

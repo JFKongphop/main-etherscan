@@ -1,0 +1,27 @@
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/login.css') }}">
+</head>
+<div>
+    <div class="navbarc">
+        <div class="containersc">
+            <div class="search-barc">
+                <a href="/"><h1 class="main-appc" id="homeee">Ethereum Tracking</h1></a>
+        </div>
+    </div>
+    <div class="containerl">
+        <h2 class="head-login">Login Admin</h2>
+        <form action="/loginAdmin" method="post">
+            <div class="loginData">
+                <label for="">Email</label>
+                <input type="email" id="email" name="email" placeholder={{ errorEmail }}>
+            </div>
+            <div class="loginData">
+                <label for="">Password</label>
+                <input type="password" id="password" name="password" placeholder={{ errorPassword }}> 
+            </div>
+            <div class="submit-login">
+                <button class="login-to" type="submit">Login</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -3,8 +3,13 @@
 {% block content %}
 <div class="container mt-4">
     <h3>Address {{ address }}</h3>
+    {% if totalSupply != "Non-Address" -%}
+        <h4>Total Supply {{ totalSupply }}</h4>
+    {% endif %}
 
-    <p>{{ balance }} Ether</p>
+    {% if "-" not in balance -%}
+        <p>{{ balance }} Ether</p>
+    {% endif %}
 
     <p>
         ${{ (balance|float * ethPrice['last'])|round }} 
