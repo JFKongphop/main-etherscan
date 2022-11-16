@@ -1,14 +1,36 @@
 import config, time, ccxt, hideData
-from flask import Flask, render_template, request, flash, redirect, url_for, session
+from datetime import date
+from flask import Flask, render_template, request, flash, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
 from web3 import Web3
 import requests
 import json
+import os
 
 app = Flask(__name__, template_folder="templates")
 app.config['SECRET_KEY'] = 'somerandomstring'
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 w3 = Web3(Web3.HTTPProvider(hideData.MAINNET_ETH)).eth
 wCheck = Web3(Web3.HTTPProvider(hideData.MAINNET_ETH))
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///myreport.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+# create model database
+class Statement(db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+    email = db.Column(db.String(50),nullable=False)
+    report = db.Column(db.String(300),nullable=False)
+
+    # create database
+    with app.app_context() as app:
+        db.create_all()
+
+
+
 
 
 def getEthPrice():
@@ -182,8 +204,6 @@ def loginAdmin():
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
-        session["email"] = email
-        session["password"] = password
         print(email, password)
 
         if not email or not password:
@@ -193,13 +213,36 @@ def loginAdmin():
                 errorPassword = "Please-enter-password"
             )
 
-        if session["email"] == "lada071159@gmail.com" and session["password"] == "123":
+        if email == "lada071159@gmail.com" and password == "123":
             return render_template(
                 'admin.html',
             )
         else:
             flash('Only Admin', 'danger')
             return redirect('/')
+
+
+@app.route('/contact')
+def contactPage():
+    return render_template('contact.html')
+
+@app.route('/deploy')
+def deployPage():
+    return render_template('deploy.html')
+
+@app.route('/report', methods=["POST"])
+def report():
+    email = request.form["email"]
+    report = request.form["problem"]
+
+    statement = Statement(email = email, report = report)
+    db.session.add(statement)
+    db.session.commit()
+    print(email, report)
+
+    flash('Message is send', 'primary')
+    return redirect('/')
+
 
 # more feature 
 '''

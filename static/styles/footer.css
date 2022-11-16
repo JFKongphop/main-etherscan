@@ -1,0 +1,37 @@
+.footerf{
+    height: 25vh;
+    background-color: black;
+    color: white;
+}
+
+.containerf{
+    display: flex;
+    align-items: center;
+    padding: 20px 5%;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.footer-bar{
+    margin-right: 50px;
+}
+
+.servicef{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-service{
+    width: 360px;
+    height: 50px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: black;
+    border: none;
+    margin-right: 20px;
+}
+
+.btn-service:hover{
+    background-color: rgb(216, 216, 216);
+}

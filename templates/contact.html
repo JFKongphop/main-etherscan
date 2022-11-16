@@ -1,0 +1,27 @@
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/contact.css') }}">
+</head>
+<div>
+    <div class="navbarc">
+        <div class="containersc">
+            <div class="search-barc">
+                <a href="/"><h1 class="main-appc" id="homeee">Ethereum Tracking</h1></a>
+        </div>
+    </div>
+    <div class="container-con">
+        <h2 class="contactus">Contact Us</h2>
+        <form action="/report" method="POST">
+            <div class="input-problem">
+                <label for="">Email</label>
+                <input type="email" name="email">
+            </div>
+            <div class="input-problem">
+                <label>Problem</label>
+                <textarea name="problem"></textarea>
+            </div>
+            <div class="submit-contact">
+                <button class="submit-to" type="submit">Submit</button>
+            </div>
+            </form>
+    </div>
+</div>
