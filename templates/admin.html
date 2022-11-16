@@ -1,3 +1,43 @@
-<div>
-    hello admin
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/admin.css') }}">
+</head>
+
+<div class="container-admin">
+    <table>
+        <tr>
+            <th>Report</th>
+            <th>Email</th>
+            <th>Delete</th>
+            <th>Reply</th>
+        </tr>
+        {% for report in myResult -%}
+            <tr>
+                <td>{{ report["problem"] }}</td>
+                <td>{{ report["email"] }}</td>
+                <td>
+                    <div class="btn-a">
+                        <a 
+                            class="delete-btn" 
+                            href="/api/delete/{{report["id"]}}" 
+                            onclick="return confirm('Do you want to delete')"
+                        >
+                            <button class="delete-btn">Delete</button>
+                        </a>
+                    </div>
+                </td >
+                <td>
+                    <div class="btn-a">
+                        <a 
+                            class="edit-btn" 
+                            href="/api/reply/{{report["email"]}}/{{report["id"]}}"
+                        >
+                            <button class="edit-btn">Reply</button>
+                        </a>
+                    </div>
+                    
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
 </div>
+    

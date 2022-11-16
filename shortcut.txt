@@ -5,3 +5,5 @@ export FLASK_ENV=development
 flask run
 
 FLASK_DEBUG
+
+before use this must start mysql xampp

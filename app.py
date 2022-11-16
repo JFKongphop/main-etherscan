@@ -1,36 +1,38 @@
 import config, time, ccxt, hideData
 from datetime import date
-from flask import Flask, render_template, request, flash, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, request, flash, redirect, url_for, make_response ,jsonify
+import mysql.connector
+from flask_cors import CORS
 from web3 import Web3
 import requests
 import json
-import os
+import smtplib
+
 
 app = Flask(__name__, template_folder="templates")
 app.config['SECRET_KEY'] = 'somerandomstring'
-basedir = os.path.abspath(os.path.dirname(__file__))
+app.config["JSON_AS_ASCII"] = False
+CORS(app)
 
 w3 = Web3(Web3.HTTPProvider(hideData.MAINNET_ETH)).eth
 wCheck = Web3(Web3.HTTPProvider(hideData.MAINNET_ETH))
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///myreport.db'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
-app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
 
-# create model database
-class Statement(db.Model):
-    id = db.Column(db.Integer,primary_key=True)
-    email = db.Column(db.String(50),nullable=False)
-    report = db.Column(db.String(300),nullable=False)
+# connect my sql
+def connectDatabase():
+    return mysql.connector.connect(
+        host = "localhost",
+        user = "root",
+        password = "",
+        db = "reports"
+    )
 
-    # create database
-    with app.app_context() as app:
-        db.create_all()
+def showData():
+    mydb = connectDatabase()
+    myCursor = mydb.cursor(dictionary=True)
+    myCursor.execute("SELECT * FROM data")
+    myResult = myCursor.fetchall()
 
-
-
+    return myResult
 
 
 def getEthPrice():
@@ -216,7 +218,9 @@ def loginAdmin():
         if email == "lada071159@gmail.com" and password == "123":
             return render_template(
                 'admin.html',
+                myResult = showData()
             )
+
         else:
             flash('Only Admin', 'danger')
             return redirect('/')
@@ -230,25 +234,88 @@ def contactPage():
 def deployPage():
     return render_template('deploy.html')
 
+# add data to database but some error
 @app.route('/report', methods=["POST"])
 def report():
     email = request.form["email"]
     report = request.form["problem"]
 
-    statement = Statement(email = email, report = report)
-    db.session.add(statement)
-    db.session.commit()
     print(email, report)
 
-    flash('Message is send', 'primary')
-    return redirect('/')
+    mydb = connectDatabase()
+    mycursor = mydb.cursor(dictionary=True)
+    sql = "INSERT INTO data (email, problem) VALUES (%s, %s)"
+    val = (email, report)
+    mycursor.execute(sql, val)
+    mydb.commit()
+
+    flash('Report send', 'primary')
+    return redirect("/")
+
+# route to connect api
+@app.route("/api/reports")
+def readApi():
+    mydb = connectDatabase()
+    myCursor = mydb.cursor(dictionary=True)
+    myCursor.execute("SELECT * FROM data")
+
+    myResult = myCursor.fetchall()
+    
+    return make_response(jsonify(myResult), 200)
+
+# delete data by id
+@app.route("/api/delete/<id>")
+def deleteReport(id):
+    mydb = connectDatabase()
+    mycursor = mydb.cursor(dictionary=True)
+    
+    # select of the id to delete
+    sql = "DELETE FROM data WHERE id = %s"
+    val = (id,)
+    mycursor.execute(sql, val)
+    mydb.commit()
+
+    return redirect("/login")
+
+@app.route("/api/reply/<email>/<id>")
+def replyReport(id, email):
+    return render_template(
+        "reply.html",
+        id = id,
+        email = email
+    )
+
+@app.route("/replyToClient", methods=["POST"])
+def replyToClient():
+    #send email
+    email = hideData.EMAIL
+    password = hideData.PASSWORD
+    
+    message = request.form["message"]
+    to = request.form["to"]
+    id = request.form["id"]
+    print(to, id)
+
+    server = smtplib.SMTP('smtp.gmail.com:587')
+    server.starttls()
+    server.login(email, password)
+    server.sendmail(email, to, message)
+
+    # after send that delete this report
+    mydb = connectDatabase()
+    mycursor = mydb.cursor(dictionary=True)
+    
+    # select of the id to delete
+    sql = "DELETE FROM data WHERE id = %s"
+    val = (id,)
+    mycursor.execute(sql, val)
+    mydb.commit()
+
+    return redirect("/login")
 
 
 # more feature 
 '''
-    1 login admin
-    2 send message to database
-    3 get message to crud in admin page
     4 deploy contract by web3.py
 '''
 

@@ -1,0 +1,23 @@
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/reply.css') }}">
+</head>
+<div>
+    <div class="container-reply">
+        <form action="/replyToClient" method="POST">
+            <div class="input-problem">
+                <input type="hidden" name="to" value={{ email }}>
+            </div>
+            <div class="input-problem">
+                <input type="hidden" name="id" value={{ id }}>
+            </div>
+            <div class="input-problem">
+                <label>Reply to : {{ email }}</label>
+                <br>
+                <textarea name="message"></textarea>
+            </div>
+             <div class="submit-contact">
+                <button class="submit-to" type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>

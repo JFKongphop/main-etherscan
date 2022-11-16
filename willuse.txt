@@ -1,0 +1,82 @@
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///myreport.db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+
+db = SQLAlchemy(app)
+
+# create model database
+class Statement(db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+    email = db.Column(db.String(50),nullable=False)
+    report = db.Column(db.String(200),nullable=False)
+
+    # create database
+    with app.app_context() as app:
+        db.create_all()
+
+from flask_sqlalchemy import SQLAlchemy
+
+
+    theReport = Statement(email = email, report = report)
+    db.session.add(theReport)
+    db.session.commit()
+    print(email, report)
+
+    flash('Message is send', 'primary')
+    return redirect('/')
+
+# @app.route("/showreport")
+# def showreport():
+#     statment = Statement.query.all()
+#     return render_template('/showreport' ,statment)
+
+# @app.route("/delete/<int:id>")
+# def deleteStatement(id):
+
+#     statement = Statement.query.filter_by(id=id).first()
+#     db.session.delete(statement)
+#     db.session.commit()
+
+#     return redirect("/showreport")
+
+# add data to database but some error
+@app.route('/report', methods=["POST"])
+def report():
+    email = request.form["email"]
+    report = request.form["problem"]
+
+    print(email, report)
+
+    mydb = connectDatabase()
+    mycursor = mydb.cursor(dictionary=True)
+    sql = "INSERT INTO data (email, problem) VALUES (%s, %s)"
+    val = (email, report)
+    mycursor.execute(sql, val)
+    mydb.commit()
+
+    flash('Report send', 'primary')
+    return redirect("/")
+
+# route to connect api
+@app.route("/api/reports")
+def readApi():
+    mydb = connectDatabase()
+    myCursor = mydb.cursor(dictionary=True)
+    myCursor.execute("SELECT * FROM data")
+
+    myResult = myCursor.fetchall()
+    print(myResult)
+    return make_response(jsonify(myResult), 200)
+
+    # connect my sql
+def connectDatabase():
+    return mysql.connector.connect(
+        host = "localhost",
+        user = "root",
+        password = "",
+        db = "reports"
+    )
+
+
