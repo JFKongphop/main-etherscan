@@ -375,13 +375,4 @@ def deployContract():
     flash(tx_receipt.contractAddress, 'primary')
     return redirect('/')
 
-
-
-
-
-# more feature 
-'''
-    4 deploy contract by web3.py
-'''
-
 app.run()
