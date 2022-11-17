@@ -1,1 +1,28 @@
-<div>deploy</div>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/deploy.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/layout.css') }}">
+</head>
+<div>
+    <div class="navbarc">
+        <div class="containersc">
+            <div class="search-barc">
+                <a href="/"><h1 class="main-appc" id="homeee">Ethereum Tracking</h1></a>
+        </div>
+    </div>
+    <br>
+    <div class="container-deploy">
+        <h2 class="head-deploy">Deploy Contract</h2>
+        <br>
+        <br>
+        <form action="/deployContract" method="POST">
+            <div class="input-contract">
+                <label>Contract</label>
+                <br>
+                <textarea name="contract" placeholder="contract.sol"></textarea>
+            </div>
+             <div class="submit-contract">
+                <button class="deploy-contract" type="submit">Deploy</button>
+            </div>
+        </form>
+    </div>
+</div>

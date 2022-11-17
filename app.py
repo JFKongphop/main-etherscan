@@ -7,6 +7,7 @@ from web3 import Web3
 import requests
 import json
 import smtplib
+from solcx import compile_source
 
 
 app = Flask(__name__, template_folder="templates")
@@ -312,6 +313,70 @@ def replyToClient():
     mydb.commit()
 
     return redirect("/login")
+
+# deploy just only testnet because it cheap
+@app.route("/deployContract", methods=["POST"])
+def deployContract():
+    contractSol = request.form["contract"]
+    w3 = Web3(Web3.HTTPProvider(hideData.GORLI))
+
+    # Solidity source code
+    compiled_sol = compile_source(
+        f'''
+            {contractSol}
+        ''',
+        output_values=['abi', 'bin']
+    )
+
+    # get abi and bytecode
+    contract_id, contract_interface = compiled_sol.popitem()
+    bytecode = contract_interface['bin']
+    abi = contract_interface['abi']
+
+    # set static account
+    account_from = {
+        "private_key": hideData.PRIVATE_KEY,
+        "address": hideData.ADDRESS,
+    }
+
+    print(f'Attempting to deploy from account: { account_from["address"] }')
+
+    Contract = w3.eth.contract(abi = abi, bytecode = bytecode)
+
+    # will develop constructor
+    def setContructor(*args):
+        variable = len(args)
+        if variable != 0:
+            for i in args:
+                construct_txn = Contract.constructor(i,).buildTransaction(
+                    {
+                        'from': account_from['address'],
+                        'nonce': w3.eth.get_transaction_count(account_from['address']),
+                    }
+                )
+            return construct_txn
+        
+        else:
+            construct_txn = Contract.constructor().buildTransaction(
+                {
+                    'from': account_from['address'],
+                    'nonce': w3.eth.get_transaction_count(account_from['address']),
+                }
+            )
+            return construct_txn
+
+    # execute and show contract after deployed
+    tx_create = w3.eth.account.sign_transaction(setContructor(), account_from['private_key'])
+    tx_hash = w3.eth.send_raw_transaction(tx_create.rawTransaction)
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+
+    print(f'Contract deployed at address: { tx_receipt.contractAddress }')
+
+    flash(tx_receipt.contractAddress, 'primary')
+    return redirect('/')
+
+
+
 
 
 # more feature 

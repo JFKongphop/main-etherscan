@@ -1,0 +1,62 @@
+*{
+    margin: 0;
+    padding: 0;
+    scroll-behavior: smooth;
+}
+
+
+
+.container-deploy{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15vh;
+}
+
+.input-contract{
+    display: flex;
+    flex-direction: column;
+    margin: 0 20px 20px 0;
+}
+
+label{
+    margin-bottom: 5px;
+}
+
+input{
+    width: 500px;
+    height: 30px;
+    font-size: 16.5px;
+    padding: 10px;
+    border-radius: 5px;
+    outline: none;
+}
+
+textarea{
+    width: 700px;
+    height: 300px;
+    font-size: 16.5px;
+    padding: 10px;
+    border-radius: 5px;
+    outline: none;
+    border: solid black;
+}
+
+.submit-contract{
+    margin-top: 30px;
+}
+
+.deploy-contract{
+    width: 100px;
+    height: 30px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    background-color: rgb(57, 57, 57);
+}
+
+.deploy-contract:hover{
+    background-color: rgb(85, 85, 85);
+}
