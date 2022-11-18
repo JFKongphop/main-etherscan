@@ -6,4 +6,4 @@ flask run
 
 FLASK_DEBUG
 
-before use this must start mysql xampp
+before use this must start mysql xampp and create database in mysql
