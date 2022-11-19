@@ -8,6 +8,7 @@ import requests
 import json
 import smtplib
 from solcx import compile_source
+from web3.gas_strategies.rpc import rpc_gas_price_strategy
 
 
 app = Flask(__name__, template_folder="templates")
@@ -226,16 +227,55 @@ def loginAdmin():
             flash('Only Admin', 'danger')
             return redirect('/')
 
+# send ether to someone only admin
+@app.route("/sendEther", methods=["POST"])
+def sendEther():
+    addressTo = request.form["address"]
+    amountTo = request.form["amount"]
 
+    w3 = Web3(Web3.HTTPProvider(hideData.GORLI))
+
+    account_from = {
+        "private_key": hideData.PRIVATE_KEY,
+        "address": hideData.ADDRESS,
+    }
+    address_to = addressTo
+
+    print(
+        f'Attempting to send transaction from { account_from["address"] } to { address_to }'
+    )
+
+    w3.eth.set_gas_price_strategy(rpc_gas_price_strategy)
+
+    tx_create = w3.eth.account.sign_transaction(
+        {
+            "nonce": w3.eth.get_transaction_count(account_from["address"]),
+            "gasPrice": w3.eth.generate_gas_price(),
+            "gas": 21000,
+            "to": address_to,
+            "value": w3.toWei(amountTo, "ether"),
+        },
+        account_from["private_key"],
+    )
+
+    tx_hash = w3.eth.send_raw_transaction(tx_create.rawTransaction)
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+
+    print(f"Transaction successful with hash: { tx_receipt.transactionHash.hex() }")
+
+    return redirect("/login")
+
+# render contact route
 @app.route('/contact')
 def contactPage():
     return render_template('contact.html')
 
+# render deploy route
 @app.route('/deploy')
 def deployPage():
     return render_template('deploy.html')
 
-# add data to database but some error
+# add data to database but some error from user
 @app.route('/report', methods=["POST"])
 def report():
     email = request.form["email"]
@@ -243,6 +283,7 @@ def report():
 
     print(email, report)
 
+    # send data to database
     mydb = connectDatabase()
     mycursor = mydb.cursor(dictionary=True)
     sql = "INSERT INTO data (email, problem) VALUES (%s, %s)"
@@ -250,6 +291,7 @@ def report():
     mycursor.execute(sql, val)
     mydb.commit()
 
+    # show after send
     flash('Report send', 'primary')
     return redirect("/")
 
@@ -261,7 +303,8 @@ def readApi():
     myCursor.execute("SELECT * FROM data")
 
     myResult = myCursor.fetchall()
-    
+
+    # show data route after report
     return make_response(jsonify(myResult), 200)
 
 # delete data by id
@@ -278,6 +321,7 @@ def deleteReport(id):
 
     return redirect("/login")
 
+# get email to reply and id to delete reply
 @app.route("/api/reply/<email>/<id>")
 def replyReport(id, email):
     return render_template(
@@ -286,17 +330,20 @@ def replyReport(id, email):
         email = email
     )
 
+# reply to client 
 @app.route("/replyToClient", methods=["POST"])
 def replyToClient():
     #send email
     email = hideData.EMAIL
     password = hideData.PASSWORD
     
+    # request data for send to client
     message = request.form["message"]
     to = request.form["to"]
     id = request.form["id"]
     print(to, id)
 
+    # send email to client
     server = smtplib.SMTP('smtp.gmail.com:587')
     server.starttls()
     server.login(email, password)

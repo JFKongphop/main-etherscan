@@ -1,8 +1,4 @@
 const connect = document.getElementById('btnc')
-const thisAddress = document.getElementById('thisAddress')
-// const formData = document.getElementById('formData')
-// const inputc = document.getElementById('inputc')
-// const search = document.querySelector('.searchc')
 
 let address = ""
 
@@ -23,30 +19,3 @@ async function getAccount() {
         connect.innerHTML = "Fail"
     }
 }
-
-
-// formData.addEventListener("change", ()=>{
-//     address = inputc.value
-//     if(address){
-//         search.addEventListener('click', ()=>{
-//             if(!address){
-//                 alert("Please enter address")
-                
-//             }
-//         })
-//     }
-//     else{
-//         window.location.reload()
-//     }
-// })
-
-
-
-
-
-// formData.addEventListener('submit', (e)=>{
-//     e.preventDefault()
-//     if (!thisAddress.value){
-//         alert("Please enter address")
-//     }
-// })
