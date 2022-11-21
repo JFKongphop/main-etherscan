@@ -79,4 +79,66 @@ def connectDatabase():
         db = "reports"
     )
 
+        '''
+        pragma solidity ^0.8.0;
 
+        contract Incrementer {
+            uint256 public number;
+            
+
+            constructor() {
+                number = 0;
+                
+            }
+
+            function increment(uint256 _value) public {
+                number = number + _value;
+            }
+
+            function reset() public {
+                number = 0;
+            }
+        }
+    '''
+
+    <table>
+        <tr>
+            <th>Txn Hash</th>
+            <th>Block</th>
+            <th>From</th>
+            <th>To</th>
+            <th></th>
+        </tr>
+        {% for txn in lastTenTrans -%}
+            <tr>
+                <td>{{ txn["hash"] }}</td>
+                <td>{{ txn["blockNumber"] }}</td>
+                <td>{{ txn["from"] }}</td >
+                <td>{{ txn["to"] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+def getLastTransAddress(address, apiKey):
+    lastTenTrans = []
+    dictTxn = {}
+    listKey = ["hash", "blockNumber", "from", "to"]
+    API = f'''
+        https://api.etherscan.io/api
+        ?module=account
+        &action=txlist
+        &address={address}
+        &startblock=0
+        &endblock=99999999
+        &page=1
+        &offset=10
+        &sort=asc
+        &apikey={apiKey}
+    '''
+    data = requests.get(API)
+    for i in range(10):
+        for j in listKey:
+            dictTxn[j] = json.loads(data.text)["result"][i][j]
+        lastTenTrans[dictTxn]
+
+    return lastTenTrans

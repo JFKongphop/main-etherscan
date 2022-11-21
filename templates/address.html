@@ -1,19 +1,41 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container mt-4">
-    <h3>Address {{ address }}</h3>
-    {% if totalSupply != "Non-Address" -%}
-        <h4>Total Supply {{ totalSupply }}</h4>
-    {% endif %}
+<div>
+    <div class="title-address">
+        <h3>Address {{ address }}</h3>
+        {% if totalSupply != "Non-Address" -%}
+            <h4>Total Supply {{ totalSupply }}</h4>
+        {% endif %}
 
-    {% if "-" not in balance -%}
-        <p>{{ balance }} Ether</p>
-    {% endif %}
+        {% if "-" not in balance -%}
+            <p>{{ balance }} Ether</p>
+        {% endif %}
 
-    <p>
-        ${{ (balance|float * ethPrice['last'])|round }} 
-        ({{ ethPrice['last'] }} / ETH)
-    </p>
+        <p>
+            ${{ (balance|float * ethPrice['last'])|round }} 
+            ({{ ethPrice['last'] }} / ETH)
+        </p>
+    </div>
+</div>
+<br>
+<br>
+<div class="contains-address">
+    <table class="all-trans">
+        <tr>
+            <th>Txn Hash</th>
+            <th>Block</th>
+            <th>From</th>
+            <th>To</th>
+        </tr>
+        {% for i in range(10) -%}
+            <tr>
+                <td class="table-add"><a href="/address?address={{ totalHash[i] }}">{{ totalHash[i] }}</a></td>
+                <td class="table-add"><a href="/block/{{ totalBlockNumber[i] }}">{{ totalBlockNumber[i] }}</a></td>
+                <td class="table-add"><a href="/address?address={{ totalFrom[i] }}">{{ totalFrom[i] }}</a></td>
+                <td class="table-add"><a href="/address?address={{ totalTo[i] }}">{{ totalTo[i] }}</a></td>
+            </tr>
+        {% endfor %}
+    </table>
 </div>
 {% endblock %}

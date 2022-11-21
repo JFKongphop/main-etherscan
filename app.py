@@ -19,6 +19,22 @@ CORS(app)
 w3 = Web3(Web3.HTTPProvider(hideData.MAINNET_ETH)).eth
 wCheck = Web3(Web3.HTTPProvider(hideData.MAINNET_ETH))
 
+# get transactions in specific address
+class GetDataAPI():
+    def __init__(self, address, apikey, typeOf):
+        self.address = address
+        self.apiKey = apikey
+        self.typeOf = typeOf
+    
+    def getDataAddress(self):
+        addressData = []
+        API = f"https://api.etherscan.io/api?module=account&action=txlist&address={self.address}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey={self.apiKey}&fbclid"
+        data = requests.get(API)
+        for i in range(10):
+            addressData.append(json.loads(data.text)["result"][i][self.typeOf])
+        
+        return addressData
+
 # connect my sql
 def connectDatabase():
     return mysql.connector.connect(
@@ -36,7 +52,7 @@ def showData():
 
     return myResult
 
-
+# will wrap by try except
 def getEthPrice():
     price = ccxt.binance()
     ethPrice = price.fetch_ticker("ETH/USDT")
@@ -153,13 +169,23 @@ def address():
     # get total supply of token if it token address
     totalSupply = getTokenTotalSupply(address, hideData.API_KEY)
 
+    # hash, block, from and to in address
+    totalHash = GetDataAPI(address, hideData.API_KEY, "hash")
+    totalBlockNumber = GetDataAPI(address, hideData.API_KEY, "blockNumber")
+    totalFrom = GetDataAPI(address, hideData.API_KEY, "from")
+    totalTo = GetDataAPI(address, hideData.API_KEY, "to")
+
     # render to address page
     return render_template(
         'address.html',
         ethPrice = ethPrice,
         address = address,
         balance = balance,
-        totalSupply = totalSupply
+        totalSupply = totalSupply,
+        totalHash = totalHash.getDataAddress(),
+        totalBlockNumber = totalBlockNumber.getDataAddress(),
+        totalFrom = totalFrom.getDataAddress(),
+        totalTo = totalTo.getDataAddress()
     )
 
 @app.route("/block/<block_number>")
